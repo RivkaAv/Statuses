@@ -1,0 +1,124 @@
+﻿@model Statuses.ViewModel.StatusAndTransitionVM
+
+<div style="width: 80%">
+    <div style="text-align: center">
+        <h2>Statuses And Transition</h2>
+    </div>
+    <hr />
+    <div style="float: left; margin: 10px;">
+        <h4 style="font-weight:bold">Add Status</h4>
+        <input id="StatusName" /><button id="AddStatusBtn">Add</button>
+        <div id="statusesDiv">
+            @Html.Partial("Statuses", Model.Statuses)
+        </div>
+       
+    </div>
+    <div style="float:right; margin: 10px">
+        <h4 style="font-weight:bold">Add Transition</h4>
+        Name:<input id="TransitionName" />
+        From: @Html.DropDownList("FromStatus", Model.StatusesToSelect as IEnumerable<SelectListItem>, "")
+        To: @Html.DropDownList("ToStatus", Model.StatusesToSelect as IEnumerable<SelectListItem>, "")
+        <button id="AddTransitionBtn">Add</button>
+        <div id="transitionsDiv">
+            @Html.Partial("Transitions", Model.Transitions)
+        </div>
+
+
+    </div>
+</div>
+
+<script>
+    $("#AddStatusBtn").click(function () {
+            $.ajax({
+            type: "POST",
+            url: '@Url.Action("CreateStatus", "Home")',
+                data: { StatusName: $("#StatusName").val() },
+                dataType: "html",
+                success: function (isAdded) {
+                    if (isAdded) {
+                        var statusValue = $("#StatusName").val();
+                        $('#statusesDiv').load('@Url.Action("ViewStatuses", "Home")');
+                        $('#FromStatus').append(`<option value="${statusValue}">${statusValue}</option>`);
+                        $('#ToStatus').append(`<option value="${statusValue}">${statusValue}</option>`);
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert(errorThrown);
+                }
+        });
+    })
+
+    $("#AddTransitionBtn").click(function () {
+            $.ajax({
+            type: "POST",
+                url: '@Url.Action("CreateTransition", "Home")',
+                data: { TransitionName: $("#TransitionName").val(), FromStatus: $("#FromStatus").val(), ToStatus: $("#ToStatus").val() },
+                dataType: "html",
+                success: function (isAdded) {
+                    if (isAdded) {
+                        loadStatusesAndTransitions();
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert(errorThrown);
+                }
+        });
+    })
+
+     function DeleteStatus(statusName) {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("DeleteStatus", "Home")',
+            data: { StatusName: statusName },
+            dataType: "html",
+            success: function (isDeleted) {
+                if (isDeleted) {
+                    $(`#FromStatus option[value="${statusName}"]`).remove();
+                    $(`#ToStatus option[value="${statusName}"]`).remove();
+                    loadStatusesAndTransitions();
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+    }
+
+    function DeleteTransition(transitionName) {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("DeleteTransition", "Home")',
+            data: { TransitionName: transitionName },
+            dataType: "html",
+            success: function (isDeleted) {
+                if (isDeleted) {
+                    loadStatusesAndTransitions();
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+    }
+
+    function UpdateStatusToInit(selectedStatus) {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("UpdateSelectedStatusToInit", "Home")',
+            data: { SelectedStatus: selectedStatus },
+            dataType: "html",
+            success: function (recData) {
+                $('#statusesDiv').load('@Url.Action("ViewStatuses", "Home")');
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+    }
+
+    function loadStatusesAndTransitions() {
+        $('#statusesDiv').load('@Url.Action("ViewStatuses", "Home")');
+        $('#transitionsDiv').load('@Url.Action("ViewTransitions", "Home")');
+    }
+
+</script>

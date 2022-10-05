@@ -1,0 +1,38 @@
+﻿@model Dictionary<string, Statuses.Models.Status>
+
+<table class="table">
+
+
+    @foreach (var item in Model)
+    {
+    <tr>
+        <td>
+            <input type="radio" @(item.Value.IsInit == true ? "checked" : "") onchange="UpdateStatusToInit('@item.Value.Name')" name="InitStaus">
+            @Html.DisplayFor(modelItem => item.Value.Name)
+        </td>
+        <td>
+            <button onclick="DeleteStatus('@item.Value.Name')">remove</button>
+        </td>
+        <td>
+            @if (item.Value.IsInit)
+            {
+                <label>[INIT]</label>
+            }
+            @if (item.Value.IsOrphan)
+            {
+                <label>[ORPHAN]</label>
+            }
+            @if (item.Value.IsFinal)
+            {
+                <label>[FINAL]</label>
+            }
+        </td>
+
+    </tr>
+    }
+
+</table>
+<script>
+
+</script>
+

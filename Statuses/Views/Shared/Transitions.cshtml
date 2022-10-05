@@ -1,0 +1,24 @@
+﻿@model Dictionary<string, Statuses.Models.Transition>
+
+<table class="table">
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Value.Name):
+            </td>
+            <td>
+                <label>@item.Value.FromStatusName -> @item.Value.ToStatusName</label>
+            </td>
+            <td>
+                <button onclick="DeleteTransition('@item.Value.Name')">remove</button>
+            </td>
+        </tr>
+    }
+
+</table>
+<script>
+
+</script>
+
